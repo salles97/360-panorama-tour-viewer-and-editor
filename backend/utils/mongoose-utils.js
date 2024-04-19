@@ -8,20 +8,20 @@ mongoose.Promise = Promise;
 
 const models = require('../schemas/models.js');
 const Panorama = mongoose.model('Panorama', models.Panorama);
-
+const Tour = mongoose.model('Tour', models.Tour); // Importando o modelo Tour
 
 mongoose.set('debug', true);
 fs.mkdirSync(ENV.DB_PATH, { recursive: true });
 
 const dbPath = ENV.DB_PATH;
-console.log({dbPath})
+console.log({ dbPath })
 
 mongoose.connect('mongodb://localhost/indoor360', {
 	dbPath,
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
 	useFindAndModify: false
- });
+});
 mongoose.connection.once('open', async () => {
 	console.log('connected', dbPath);
 });
@@ -35,9 +35,9 @@ mongoose.connection.on('error', (err) => {
 // const mongourl = process.env.NODE_DB || 'mongodb://127.0.0.1:27017/indoor360';
 // console.log(`selected mongodb: ${mongourl}`);
 // mongoose.connect(mongourl, {
-// 	useNewUrlParser: true,
-// 	useUnifiedTopology: true,
-// 	useFindAndModify: false
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//     useFindAndModify: false
 // });
 
 
@@ -67,7 +67,7 @@ const populateEmptyDatabase = () => {
 
 // DEVELOPMENT: this drops the database! Use with care! Create database backup prior!
 const dropDatabase = () => {
-	Panorama.remove({}, function(err) {
+	Panorama.remove({}, function (err) {
 		if (err) {
 			console.error(error);
 			return;
@@ -78,6 +78,7 @@ const dropDatabase = () => {
 
 module.exports = {
 	Panorama,
+	Tour, // Adicionando o modelo Tour às exportações
 	dropDatabase,
 	populateEmptyDatabase
 }

@@ -2,39 +2,54 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const Hotspot = new Schema({
-	type:		{ type: String, default: "", required: true },
+	type: { type: String, default: "", required: true },
 
 	/* standard hotspot values */
-	yaw:		{ type: Number, default: 0.0, required: true },
-	pitch:		{ type: Number, default: 0.0, required: true },
-	
+	yaw: { type: Number, default: 0.0, required: true },
+	pitch: { type: Number, default: 0.0, required: true },
+
 	/* portal specific values */
-	target:		{ type: String },
-	rotation:	{ type: Number },
+	target: { type: String },
+	rotation: { type: Number },
 	preserveOrientationBetweenPanoramas: { type: Boolean, default: true },
-	targetYaw:	{ type: Number },
-	
+	targetYaw: { type: Number },
+
 	/* info hotspot specific values */
-	title:		{ type: String },
-	text:		{ type: String }
+	title: { type: String },
+	text: { type: String }
 });
 
 const Panorama = new Schema({
-	name:		{ type: String, default: ""  	},
-	lat:		{ type: Number, default: 0.0 	},
-	lng:		{ type: Number, default: 0.0 	},
-	orientation:{ type: Number, default: 0.0 	},
-	isIndoors: 	{ type: Boolean, default: false	},
-	floor:		{ type: Number, default: 0   	},
-	building:	{ type: String, default: ""  	},
-	room:		{ type: String, default: ""  	},
-	yaw:		{ type: Number, default: 0.0, required: true },
+	name: { type: String, default: "" },
+	lat: { type: Number, default: 0.0 },
+	lng: { type: Number, default: 0.0 },
+	orientation: { type: Number, default: 0.0 },
+	isIndoors: { type: Boolean, default: false },
+	floor: { type: Number, default: 0 },
+	building: { type: String, default: "" },
+	room: { type: String, default: "" },
+	yaw: { type: Number, default: 0.0, required: true },
 
 	cubemapLevels: { type: [Schema.Types.Mixed], required: true, default: {} },
-	
-	hotspots:	{ type: [Hotspot], default: [] },
-	poiRadius:	{ type: Number, default: 10, required: true },
-	isStart:	{ type: Boolean	}
+
+	hotspots: { type: [Hotspot], default: [] },
+	poiRadius: { type: Number, default: 10, required: true },
+	isStart: { type: Boolean },
+
+	tour: { type: Schema.Types.ObjectId, ref: 'Tour' }
+});
+
+const User = new Schema({
+	username: { type: String, required: true },
+	email: { type: String, required: true },
+	password: { type: String, required: true },
+	tours: [{ type: Schema.Types.ObjectId, ref: 'Tour' }]
+});
+
+const Tour = new Schema({
+	name: { type: String, default: "" },
+	user: { type: Schema.Types.ObjectId, ref: 'User' },
+	panoramas: [{ type: Schema.Types.ObjectId, ref: 'Panorama' }]
 });
 
 // Panorama.virtual('id').get(	function () { return this._id.toHexString() });
@@ -45,3 +60,5 @@ const Panorama = new Schema({
 
 exports.Panorama = Panorama;
 exports.Hotspot = Hotspot;
+exports.User = User;
+exports.Tour = Tour;

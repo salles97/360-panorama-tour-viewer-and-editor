@@ -1,25 +1,24 @@
-const { Panorama }	= require('../utils/mongoose-utils');
+const { Panorama } = require('../utils/mongoose-utils');
 
 exports.createHotspot = (req, res) => {
-	Panorama.findOne({ _id: req.body._id }, (err, panoramaDocument) => {
-		if (err || !panoramaDocument) {
-			// TODO
-			console.error("ERROR", err, panoramaDocument);
+	Panorama.findById(req.body.panoramaId, (err, panorama) => {
+		if (err || !panorama) {
+			console.error(err);
+			// TODO enviar resposta de erro
 			return;
 		}
 
-		let newHotspotDoc = panoramaDocument.hotspots.create(req.body.hotspot);
-		panoramaDocument.hotspots.push(newHotspotDoc);
+		const newHotspot = req.body.hotspot;
+		panorama.hotspots.push(newHotspot);
 
-		panoramaDocument.save((err, updatedPanorama) => {
-			let doc = updatedPanorama.hotspots.id(newHotspotDoc._id);
-			if (err || !doc) {
+		panorama.save((err, updatedPanorama) => {
+			if (err) {
 				console.error(err);
-				// TODO
+				// TODO enviar resposta de erro
 				return;
 			}
-			res.send({ hotspot: doc });
-		})
+			res.status(200).json({ hotspot: newHotspot });
+		});
 	});
 };
 
@@ -33,7 +32,7 @@ exports.updateHotspot = (req, res) => {
 		}
 
 		let hotspotDocument = panoramaDocument.hotspots.id(data._id);
-		
+
 		if (!hotspotDocument) {
 			// TODO send error response
 			return;
@@ -68,21 +67,21 @@ exports.deleteHotspot = (req, res) => {
 		}
 
 		let hotspotDocument = panoramaDocument.hotspots.id(req.body._id);
-		
+
 		if (!hotspotDocument) {
 			// TODO send error response
 			return;
 		}
 
-        hotspotDocument.remove();
+		hotspotDocument.remove();
 
 		panoramaDocument.save((err, updatedPanorama) => {
 			if (err) {
 				console.error(err);
-				res.send( { deleted: false });
+				res.send({ deleted: false });
 				return;
 			}
-			res.send( { deleted: true, _id: req.body._id });
+			res.send({ deleted: true, _id: req.body._id });
 		});
 	});
 };

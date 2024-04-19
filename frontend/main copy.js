@@ -1,18 +1,18 @@
-import BackendAPI from 'frontend/http/backend-api';
-import Panoramas from 'frontend/marzipano/panoramas';
-import PanoramaList from 'frontend/menus/panorama-list';
-import LoginMenu from 'frontend/menus/login-menu';
-import Hotspots from 'frontend/marzipano/hotspots';
-import Autorotation from 'frontend/others/autorotate';
-import Detection from 'frontend/others/browser-detection';
-import Controls from 'frontend/others/controls';
-import Fullscreen from 'frontend/others/fullscreen';
-import Minimap from 'frontend/map/minimap';
+import BackendAPI 		from 'frontend/http/backend-api';
+import Panoramas    	from 'frontend/marzipano/panoramas';
+import PanoramaList 	from 'frontend/menus/panorama-list';
+import LoginMenu		from 'frontend/menus/login-menu';
+import Hotspots 		from 'frontend/marzipano/hotspots';
+import Autorotation 	from 'frontend/others/autorotate';
+import Detection 		from 'frontend/others/browser-detection';
+import Controls			from 'frontend/others/controls';
+import Fullscreen 		from 'frontend/others/fullscreen';
+import Minimap			from 'frontend/map/minimap';
 
-import Portal from 'frontend/hotspots/portal';
-import POI from 'frontend/hotspots/poi';
-import TextInfo from 'frontend/hotspots/text-info';
-import North from 'frontend/hotspots/north';
+import Portal 			from 'frontend/hotspots/portal';
+import POI    			from 'frontend/hotspots/poi';
+import TextInfo 		from 'frontend/hotspots/text-info';
+import North			from 'frontend/hotspots/north';
 
 const RAD = Math.PI / 180;
 
@@ -30,35 +30,14 @@ export default class Main {
 	 * @method setup
 	 * @static
 	 */
-	// static setup() { // start application by loading data from the backend
-	// 	BackendAPI.getAllPanoramaData(
-	// 		Main.showTourDetails,
-	// 		() => Main.showError
-	// 	);
-	// }
-	static setup() {
-		// Inicializar a aplicação exibindo a listagem de tours
+	static setup() { // start application by loading data from the backend
 		BackendAPI.getAllPanoramaData(
-			Main.startApplication, () => Main.showError);
-	}
-
-
-	static showTourDetails(tour_id) {
-		// Fazer uma solicitação ao backend para obter os detalhes de um tour específico
-		const tourId = tour_id; // Substitua pelo ID do tour desejado
-		BackendAPI.getTourById(
-			tourId,
-			(tourData) => {
-				// Chamar startApplication() com os detalhes do tour recebidos
-				Main.startApplication(tourData.panoramas);
-			},
-			(error) => {
-				// Lidar com o erro se não for possível obter os detalhes do tour
-				Main.showError(error);
-			}
+			Main.startApplication,
+			() => Main.showError
 		);
 	}
 
+	
 	/**
 	 * Initializes the application with the provided panorama documents.
 	 * This should only be called once on application startup after retrieving the panorama documents.
@@ -67,17 +46,17 @@ export default class Main {
 	 * @param {Array} panoramaDocuments Contains all panorama documents. Will be used to create marzipano panorama scenes from.
 	 */
 	static startApplication(panoramaDocuments) {
-
+		
 		// set state
 		global.state = Main.initState();
-
+		
 		// preperation work
 		Detection.setup();
-
+		
 		// init Marzipano
 		Panoramas.setup(panoramaDocuments);
 		Hotspots.initHotspots(panoramaDocuments);
-
+		
 		// setup UI
 		PanoramaList.setup();
 		Minimap.setup();
@@ -90,14 +69,14 @@ export default class Main {
 		document.querySelector('body').addEventListener('contextmenu', (event) => {
 			event.preventDefault();
 		});
-
+		
 		// determine and switch to starting panorama
 		Panoramas.openStartPanorama();
 
 		// check if user was already logged in from a previous session.
 		LoginMenu.checkIfAlreadyLoggedIn()
 	}
-
+	
 	/**
 	 * Handles an error message.
 	 * @method showError
@@ -108,7 +87,7 @@ export default class Main {
 		// TODO toast popup
 		console.error(e);
 	}
-
+	
 	/**
 	 * Creates and returns an object with default values that will be used as the global state object throughout the application to read and write data.
 	 * @method initState
@@ -116,71 +95,71 @@ export default class Main {
 	 * @return {Object} The state object with initial values.
 	 */
 	static initState() {
-		let get = (str) => document.querySelector(str);
-
+		let get    = (str) => document.querySelector(str);
+	
 		return {
-			panoramasByID: {},
-
+			panoramasByID:	{},
+	
 			hotspotTypes: {
-				portal: Portal,
-				textInfo: TextInfo,
-				poi: POI,
-				north: North
+				portal:		Portal,
+				textInfo:	TextInfo,
+				poi:		POI,
+				north:		North
 			},
 			hotspots: {},
-
-			viewer: undefined,
-			currentPanorama: undefined,
+			
+			viewer:		undefined,
+			currentPanorama:undefined,
 			autorotate: undefined,
 
-			currentSidebar: {},
+			currentSidebar: { },
 
 			cache: {
 				buildings: {},
 			},
 
 			tempData: {},
-
+	
 			settings: {
 				preloadAllPanoramaImages: false, // if true preloads all panorama images on startup (slow startup, but if set to false no transition animation because of long load time)
 				panoramaTransitionDuration: 500,
-
+	
 				velocity: 0.55,
 				friction: 1.5,
-
+				
 				autorotateEnabled: false,
 				allowFullscreen: true,
 
 				editorEnabled: false
 			},
-
+	
 			htmlElements: {
-				pano: get('#pano'),
+				pano:				get('#pano'),
+		
+				titleBar:			get('#titleBar'),
+				panoramaName:		get('#titleBar .panoramaName'),
+				panoramaList:		get('#panoramaList'),
+				loginMenu:			get('#loginMenu'),
+				minimap:			get('#minimap-container'),
 
-				titleBar: get('#titleBar'),
-				panoramaName: get('#titleBar .panoramaName'),
-				panoramaList: get('#panoramaList'),
-				loginMenu: get('#loginMenu'),
-				minimap: get('#minimap-container'),
-
-				sidebar: get('#detailSidebar'),
-				sidebarContainer: get('#sidebarContainer'),
-
-				panoramaListToggle: get('#panoramaListToggle'),
-				minimapToggle: get('#minimapToggle'),
-				autorotateToggle: get('#autorotateToggle'),
-				fullscreenToggle: get('#fullscreenToggle'),
-
-				viewUp: get('#viewUp'),
-				viewDown: get('#viewDown'),
-				viewLeft: get('#viewLeft'),
-				viewRight: get('#viewRight'),
-				viewIn: get('#viewIn'),
-				viewOut: get('#viewOut'),
+				sidebar:			get('#detailSidebar'),
+				sidebarContainer:	get('#sidebarContainer'),
+				
+				panoramaListToggle:	get('#panoramaListToggle'),
+				minimapToggle:		get('#minimapToggle'),
+				autorotateToggle:	get('#autorotateToggle'),
+				fullscreenToggle:	get('#fullscreenToggle'),
+		
+				viewUp:				get('#viewUp'),
+				viewDown:			get('#viewDown'),
+				viewLeft:			get('#viewLeft'),
+				viewRight:			get('#viewRight'),
+				viewIn:				get('#viewIn'),
+				viewOut:			get('#viewOut'),
 			}
 		};
 	}
-
+	
 	/**
 	 * Converts an angle in degree to radian.
 	 * @method degToRad
@@ -189,9 +168,9 @@ export default class Main {
 	 * @return {Number} The angle in radian.
 	 */
 	static degToRad(deg) {
-		return deg * RAD
+		return deg*RAD
 	}
-
+	
 	/**
 	 * Converts an angle in radian to degree.
 	 * @method radToDeg
@@ -200,6 +179,6 @@ export default class Main {
 	 * @return {Number} The angle in degree
 	 */
 	static radToDeg(rad) {
-		return rad / RAD
+		return rad/RAD
 	}
 }

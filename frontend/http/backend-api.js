@@ -8,7 +8,7 @@ import jwt_decode from 'node_modules/jwt-decode';
  * @static
  */
 export default class BackendAPI {
-	
+
 	/**
 	 * Requests backend data about all panoramas documents and returns them via callback function.
 	 * @method getAllPanoramaData
@@ -19,6 +19,51 @@ export default class BackendAPI {
 	static getAllPanoramaData(resolve, reject) {
 		axios.get("panoramas/")
 			.then(response => { resolve(response.data.panoramas); })
+			.catch(error => { reject(error); });
+	}
+
+	/**
+ * Requests backend data about panoramas associated with a specific tour and returns them via callback function.
+ * @method getPanoramasByTourId
+ * @static
+ * @param {String} tourId The ID of the tour for which panoramas are requested.
+ * @param {Function(panoramas)} resolve The callback function to handle the data on successful HTTP request.
+ * @param {Function(error)} reject The callback function to handle the error message on unsuccessful HTTP request.
+ */
+	static getPanoramasByTourId(tourId, resolve, reject) {
+		axios.get(`tours/${tourId}`)
+			.then(response => { resolve(response.data.panoramas); })
+			.catch(error => { reject(error); });
+	}
+
+
+	/**
+		 * Requests backend data about all Tours documents and returns them via callback function.
+		 * @method getAllTours
+		 * @static
+		 * @param {Function(Tours)} resolve The callback function to handle the data on successful http request.
+		 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
+		 */
+	static getAllTours(resolve, reject) {
+		axios.get("/api/tours")
+			.then(response => {
+				console.log(response);
+				resolve(response.tours);
+			})
+			.catch(error => { reject(error); });
+	}
+
+	/**
+	 * Requests backend data about all Tours documents and returns them via callback function.
+	 * @method getTourById
+		 * @static	
+	 * @param {String} _id The id to identify the panorama document with.
+	 * @param {Function(Tours)} resolve The callback function to handle the data on successful http request.
+	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
+	 */
+	static getTourById(id, resolve, reject) {
+		axios.get("/tours" + id)
+			.then(response => { resolve(response.data.views); })
 			.catch(error => { reject(error); });
 	}
 
@@ -54,9 +99,9 @@ export default class BackendAPI {
 			.catch(error => { reject(error); });
 	}
 
-	
+
 	// EDITOR API CALLS
-	
+
 	/**
 	 * Create a new panorama. Returns the newly created panorama object.
 	 * @method createNewPanorama
@@ -71,7 +116,7 @@ export default class BackendAPI {
 		let formData = new FormData();
 		for (let imageName in images) {
 			let blob = images[imageName];
-            formData.append('cubemaptiles', blob, imageName);
+			formData.append('cubemaptiles', blob, imageName);
 		}
 		formData.append('widthAndHeight', widthAndHeight);
 		formData.append('originalImageFileName', originalImageFileName);
@@ -173,7 +218,7 @@ export default class BackendAPI {
 			.then(response => { resolve(response.data); })
 			.catch(error => { reject(error); });
 	}
-	
+
 
 	/**
 	 * Sends a login request to the backend. Currently only used to login as admin to make changes on the database via the integrated editor on the website.
@@ -211,7 +256,7 @@ export default class BackendAPI {
 			.catch(error => { reject(error); });
 	}
 
-	
+
 	/**
 	 * Sends a request to the backend to check if the jwt token on localStorage is still valid. Currently only used to login as admin to make changes on the database via the integrated editor on the website.
 	 * @method isAdmin

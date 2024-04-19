@@ -9,9 +9,10 @@ const express = require('express');
 const router = express.Router();
 
 
-router.post(	'/'	, (req, res, next) => checkAuth(req, res, next, ["admin"])	, upload.array('cubemaptiles', 6),	PanoramaController.createPanorama); // adds new panorama image
-router.put(		'/'	, (req, res, next) => checkAuth(req, res, next, ["admin"])	,									PanoramaController.updatePanorama); // update an existing panorama image
-router.delete(	'/'	, (req, res, next) => checkAuth(req, res, next, ["admin"])	,									PanoramaController.deletePanorama); // delete a panorama image
+router.post('/', (req, res, next) => checkAuth(req, res, next, ["admin"]), upload.array('cubemaptiles', 6), PanoramaController.createPanorama); // adds new panorama image
+router.put('/', (req, res, next) => checkAuth(req, res, next, ["admin"]), PanoramaController.updatePanorama); // update an existing panorama image
+router.delete('/', (req, res, next) => checkAuth(req, res, next, ["admin"]), PanoramaController.deletePanorama); // delete a panorama image
+router.get('/:tourId', (req, res, next) => { }, PanoramaController.getPanoramasForTour);
 
 
 module.exports = router;

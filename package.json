@@ -9,8 +9,8 @@
     "debug": "nodemon --inspect server.js",
     "webpack-start": "webpack --mode development --watch --progress",
     "webpack-build": "webpack --mode production",
-    "docker-build": "docker build -t <NAME>/panorama360 .",
-    "docker-run": "docker run -d --rm --name panorama360 -p 8080:3000 <NAME>/panorama360"
+    "docker-build": "docker build -t teste_pan/panorama360 .",
+    "docker-run": "docker run -d  --name panorama360 -p 8080:3000 teste_pan/panorama360"
   },
   "author": "",
   "license": "MIT",

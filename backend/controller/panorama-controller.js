@@ -1,21 +1,32 @@
-const fs	= require('fs-extra');
-const path	= require('path');
+const fs = require('fs-extra');
+const path = require('path');
 
-const ENV					= require('../constants');
-const { Panorama }			= require('../utils/mongoose-utils');
-const { generateLevels } 	= require('../utils/cubemap-generator-utils');
+const ENV = require('../constants');
+const { Panorama, Tour } = require('../utils/mongoose-utils'); // Importe o modelo de Tour
+
+const { generateLevels } = require('../utils/cubemap-generator-utils');
+
+exports.getPanoramasForTour = async (req, res) => {
+	try {
+		const tourId = req.params.tourId;
+		const panoramas = await Panorama.find({ tour: tourId }).populate('hotspots');
+		res.json({ panoramas });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
+};
 
 exports.getAllPanoramas = (req, res) => {
 	Panorama.find({}, (err, panoramas) => {
 		if (err) {
 			console.error(err);
-			// TODO send error response
+			// TODO enviar resposta de erro
 			return;
 		}
 		res.send({ panoramas: panoramas });
 	});
 };
-
 
 exports.createPanorama = (req, res) => {
 	if (!req.files) {
@@ -23,56 +34,65 @@ exports.createPanorama = (req, res) => {
 		return;
 	}
 
-	// create new panorama document
-	let panoramaDoc = new Panorama();
-	
+	const panoramaDoc = new Panorama();
+
 	generateLevels(
-		panoramaDoc._id.toHexString(), // id as string
+		panoramaDoc._id.toHexString(),
 		req.files,
 		parseInt(req.body.widthAndHeight),
 		(cubemapLevels) => {
 			panoramaDoc.cubemapLevels = cubemapLevels;
-			panoramaDoc.name = req.body.originalImageFileName || "Unknown name",
-			console.log(panoramaDoc)
+			panoramaDoc.name = req.body.originalImageFileName || "Unknown name";
+
 			panoramaDoc.save((err, panorama) => {
 				if (err) {
 					console.error(err);
-					// TODO send error response
+					// TODO enviar resposta de erro
 					return;
 				}
 				console.log("New panorama added!");
-				res.status(200).json({ panorama: panorama });
+
+				// Se houver um tour associado ao panorama, atualize o tour
+				if (req.body.tourId) {
+					Tour.findByIdAndUpdate(req.body.tourId, { $push: { panoramas: panorama._id } }, (err) => {
+						if (err) {
+							console.error(err);
+							// TODO enviar resposta de erro
+							return;
+						}
+						res.status(200).json({ panorama });
+					});
+				} else {
+					res.status(200).json({ panorama });
+				}
 			});
 		}
-	)
-	
+	);
 };
 
-
 exports.updatePanorama = (req, res) => {
-	let data = req.body.panorama;
-
-	// TODO send new equirectengular panorama image from frontend on creation and set unique file name (based on panorama document _id?)
+	const data = req.body.panorama;
 
 	Panorama.findById(data._id, (err, panorama) => {
 		if (err) {
 			console.error(err);
-			// TODO send error response
+			// TODO enviar resposta de erro
 			return;
 		}
-		// remove data that isnt allowed to be changed via this post request
+
+		// Remova dados que não podem ser alterados via esta solicitação
 		delete data._id;
 		delete data.id;
 		delete data.hotspots;
 
-		for (let key in data) {
+		for (const key in data) {
 			panorama[key] = data[key];
 		}
 
 		panorama.save((err, updatedPanorama) => {
 			if (err) {
 				console.error(err);
-				// TODO send error response
+				// TODO enviar resposta de erro
 				return;
 			}
 			res.send({ panorama: updatedPanorama });
@@ -80,19 +100,18 @@ exports.updatePanorama = (req, res) => {
 	});
 };
 
-
 exports.deletePanorama = (req, res) => {
 	Panorama.deleteOne({ _id: req.body._id }, (err) => {
 		if (err) {
 			console.error(err);
-			res.send( { deleted: false });
+			res.send({ deleted: false });
 			return;
 		}
 		fs.remove(path.join(ENV.PANORAMA_DIRECTORY, req.body._id), (err) => {
 			if (err) {
 				console.error(err);
 			}
-			res.send( { deleted: true });
+			res.send({ deleted: true });
 		});
-	})
+	});
 };

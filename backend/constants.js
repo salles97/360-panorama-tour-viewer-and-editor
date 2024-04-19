@@ -1,12 +1,13 @@
 const path = require('path');
 
-const EXPRESS_PORT		= 3000;
-const JWT_KEY			= "AWDWN124WAKNUF432WNKFANUWKFANK679ANUFAWBFADFB4572352AUKFD";
-const ADMIN_USERNAME	= "admin";
-const ADMIN_PASSWORD	= "admin";
+const EXPRESS_PORT = 3000;
+const JWT_KEY = "AWDWN124WAKNUF432WNKFANUWKFANK679ANUFAWBFADFB4572352AUKFD";
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "admin";
 
-const PANORAMA_DIRECTORY = path.join(__dirname, 'public', 'panoramas');
 const CMD_BUILDING_OUTLINES_DIRECTORY = path.join(__dirname, 'public', 'cmd-building-info');
+const PANORAMA_DIRECTORY = path.join(__dirname, 'public', 'panoramas');
+const TOUR_DIRECTORY = path.join(__dirname, 'public', 'tour');
 
 const FAVICON_PATH = path.join(__dirname, 'public', 'favicon.ico');
 const STATIC_FILES = path.join(__dirname, 'public');
@@ -22,5 +23,6 @@ module.exports = Object.freeze({
 	CMD_BUILDING_OUTLINES_DIRECTORY,
 	FAVICON_PATH,
 	STATIC_FILES,
-	DB_PATH
+	DB_PATH,
+	TOUR_DIRECTORY
 });
