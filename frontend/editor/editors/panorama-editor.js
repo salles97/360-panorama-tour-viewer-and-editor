@@ -1,14 +1,14 @@
-import Main				from 'frontend/main';
-import BackendAPI		from 'frontend/http/backend-api';
-import Hotspots			from 'frontend/marzipano/hotspots';
-import Panoramas		from 'frontend/marzipano/panoramas';
-import PanoramaList		from 'frontend/menus/panorama-list';
+import Main from 'frontend/main';
+import BackendAPI from 'frontend/http/backend-api';
+import Hotspots from 'frontend/marzipano/hotspots';
+import Panoramas from 'frontend/marzipano/panoramas';
+import PanoramaList from 'frontend/menus/panorama-list';
 
-import EditorSidebar	from 'editor/menus/editor-sidebar';
-import ContextMenu		from 'editor/menus/context-menu';
-import UploadMenu		from 'editor/menus/upload-menu';
+import EditorSidebar from 'editor/menus/editor-sidebar';
+import ContextMenu from 'editor/menus/context-menu';
+import UploadMenu from 'editor/menus/upload-menu';
 
-import Migration		from 'editor/migration';
+import Migration from 'editor/migration';
 
 /**
  * This static class is all about creating, editing and deleting panoramas for the editor.
@@ -41,7 +41,7 @@ export default class PanoramaEditor {
 					return;
 				}
 				EditorSidebar.openPanoramaEditorMenu();
-				
+
 			},
 			true
 		);
@@ -66,35 +66,38 @@ export default class PanoramaEditor {
 	 */
 	static getEditableValues() {
 		return {
-			"name":			{ type: "text"			, label: "Name"				},
-			"location":		{ type: "locationPicker", label: "Location"			},
-			"yaw":			{ type: "buttonYawMenu"	, label: "InitialYaw"		},
-			"orientation":	{ type: "orientation"	, label: "Orientation"		},
+			"name": { type: "text", label: "Name" },
+			"location": { type: "locationPicker", label: "Location" },
+			"yaw": { type: "buttonYawMenu", label: "InitialYaw" },
+			"orientation": { type: "orientation", label: "Orientation" },
 			// "poiRadius":	{ type: "range"			, label: "POI Radius",	min: 1, max:	25, step: 1	},
-			"isStart":		{ type: "checkbox"		, label: "isStart"			},
-			"isIndoors":	{ type: "checkbox"		, label: "isIndoors"		},
-			"building":		{ type: "text"			, label: "Building"			},
-			"floor":		{ type: "range"			, label: "Floor",		min: -10, max: 30, step: 1 },
-			"room":			{ type: "text"			, label: "Room"				}
+			"isStart": { type: "checkbox", label: "isStart" },
+			"isIndoors": { type: "checkbox", label: "isIndoors" },
+			"building": { type: "text", label: "Building" },
+			"floor": { type: "range", label: "Floor", min: -10, max: 30, step: 1 },
+			"room": { type: "text", label: "Room" }
 		};
 	}
-	
+
 	/**
 	 * Creates a new panorama on the backend server.
 	 * @method create
-	 * @static
+	 * @static 
 	 * @param {Object} images A object with the cubemap side as key and the image blob as value.
 	 * @param {Number} widthAndHeight The width and height of one cubemap face. Since the image is quadratic the height and width are the same.
 	 * @param {String} originalImageFileName The original image file name. Used to initialize the name of the newly created panorama with.
+	 * @param {String} tourId  A identificador for the Tour.
 	 */
-	static create(images, widthAndHeight, originalImageFileName) {
+	static create(images, widthAndHeight, originalImageFileName, tourId) {
+		console.log('AAAA', tourId);
 		BackendAPI.createNewPanorama(
 			images,
 			widthAndHeight,
 			originalImageFileName,
+			tourId,
 			(responseData) => {
 				PanoramaEditor.createPanorama(responseData.panorama);
-				
+
 				// close and cleanup upload menu
 				UploadMenu.close();
 				state.htmlElements.uploadMenuFileInput.disabled = false;
@@ -112,7 +115,7 @@ export default class PanoramaEditor {
 				state.htmlElements.uploadMenuFileInputCubeMap.back.value = null;
 				state.htmlElements.uploadMenuFileInputCubeMap.right.value = null;
 				state.htmlElements.uploadMenuFileInputCubeMap.left.value = null;
-				
+
 				while (state.htmlElements.uploadMenuCubeMapFaces.firstChild) {
 					state.htmlElements.uploadMenuCubeMapFaces.removeChild(state.htmlElements.uploadMenuCubeMapFaces.firstChild);
 				}
@@ -125,7 +128,7 @@ export default class PanoramaEditor {
 			}
 		);
 	}
-	
+
 	/**
 	 * Update an existing panorama on the backend server.
 	 * @method update
@@ -143,7 +146,7 @@ export default class PanoramaEditor {
 			}
 		);
 	}
-	
+
 	/**
 	 * Deletes an existing panorama by its id on the backend server.
 	 * @method delete
@@ -177,7 +180,7 @@ export default class PanoramaEditor {
 
 		PanoramaList.refresh();
 		Panoramas.switchToPanorama(panorama);
-		
+
 		setTimeout(() => {
 			EditorSidebar.openPanoramaEditorMenu();
 		}, 50);

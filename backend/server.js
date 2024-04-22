@@ -35,7 +35,7 @@ app.use('/cmd/', express.static(ENV.CMD_BUILDING_OUTLINES_DIRECTORY)); // serve 
 app.use('/panorama', PanoramaRouter);
 app.use('/hotspot', HotspotRouter);
 app.use('/user', UserRouter);
-app.use('/api', TourRouter); // Use as rotas do Tour
+app.use('/tour', TourRouter); // Use as rotas do Tour
 
 // /data is deprecated: use /panoramas/ instead
 app.get('/data', PanoramaController.getAllPanoramas);

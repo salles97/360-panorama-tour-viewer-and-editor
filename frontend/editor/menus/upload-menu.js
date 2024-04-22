@@ -19,7 +19,7 @@ export default class UploadMenu {
 				<div class="row">
 					<div class="column">
 						<div class="upload-menu-header-text">Upload panorama image! Select format, then file(s):</div>
-					
+
 						<div class="tab">
 							<button class="tablinks" id="tablink-equirectangular">Equirectangular</button>
 							<button class="tablinks" id="tablink-cubemap">CubeMap</button>
@@ -54,12 +54,12 @@ export default class UploadMenu {
 								<label class="input-button">Bottom <input id="imageFileInputDown" type="file" accept="image/*" /></label>
 							</div>
 						</div>
-						
+
 						<div class="upload-menu-text">Equirectangular image will be converted into six cubemap faces.</div>
 						<div class="upload-menu-text">On successful convertion the cubemap will be uploaded.</div>
 						<div class="upload-menu-text">A new panorama will be created and switched to!</div>
 					</div>
-					
+
 					<div class="column">
 						<div class="upload-menu-header-text">Preview</div>
 
@@ -69,7 +69,7 @@ export default class UploadMenu {
 						</div>
 					</div>
 				</div>
-				
+
 				<div class="editor-item-list-container">
 					<div class="editor-item-element-row">
 						<div class="editor-item-element-medium">
@@ -77,7 +77,7 @@ export default class UploadMenu {
 						</div>
 					</div>
 				</div>
-			
+
 			</div>
 		);
 
@@ -85,21 +85,21 @@ export default class UploadMenu {
 		state.htmlElements.uploadMenuCanvas = document.createElement('canvas');
 		state.htmlElements.uploadMenuCubeMapFaces = document.getElementById('cubeMapFaces');
 		state.htmlElements.uploadMenuLoadingCircle = document.getElementById('upload-menu-loading-circle');
-		
+
 		state.htmlElements.uploadMenuFileInput = document.getElementById('imageFileInput');
-		
+
 		state.htmlElements.uploadMenuFileInputCubeMap = {
-			up:	document.getElementById('imageFileInputUp'),
-			down:	document.getElementById('imageFileInputDown'),
-			front:	document.getElementById('imageFileInputFront'),
-			back:	document.getElementById('imageFileInputBack'),
-			right:	document.getElementById('imageFileInputRight'),
-			left:	document.getElementById('imageFileInputLeft')
+			up: document.getElementById('imageFileInputUp'),
+			down: document.getElementById('imageFileInputDown'),
+			front: document.getElementById('imageFileInputFront'),
+			back: document.getElementById('imageFileInputBack'),
+			right: document.getElementById('imageFileInputRight'),
+			left: document.getElementById('imageFileInputLeft')
 		}
-		
+
 		document.getElementById('tablink-equirectangular').addEventListener('click', (e) => { UploadMenu.openTab(e, 'tab-equirectangular') })
-		document.getElementById('tablink-cubemap').addEventListener(		'click', (e) => { UploadMenu.openTab(e, 'tab-cubemap') })
-		
+		document.getElementById('tablink-cubemap').addEventListener('click', (e) => { UploadMenu.openTab(e, 'tab-cubemap') })
+
 		document.getElementById('upload-menu-cancel-button').addEventListener('click', () => {
 			UploadMenu.close();
 		})
@@ -147,7 +147,7 @@ export default class UploadMenu {
 			UploadMenu.processImage(data);
 		});
 	}
-	
+
 	/**
 	 * Loads the cubemap image faces from the html file input elements and sends them to the backend.  
 	 * @method loadCubeMapImage
@@ -175,19 +175,19 @@ export default class UploadMenu {
 			{ side: 'left', image: state.htmlElements.uploadMenuFileInputCubeMap.left.files[0] }
 		];
 		const facePositions = {
-			back: 	{ x: 3, y: 1 },
-			front: 	{ x: 1, y: 1 },
-			left: 	{ x: 0, y: 1 },
-			right: 	{ x: 2, y: 1 },
-			up: 	{ x: 1, y: 0 },
-			down: 	{ x: 1, y: 2 }
+			back: { x: 3, y: 1 },
+			front: { x: 1, y: 1 },
+			left: { x: 0, y: 1 },
+			right: { x: 2, y: 1 },
+			up: { x: 1, y: 0 },
+			down: { x: 1, y: 2 }
 		};
 
 		let uploadCubeMapFaces = (width) => {
 			if (!state.htmlElements.uploadMenuLoadingCircle.classList.contains('visible')) {
 				state.htmlElements.uploadMenuLoadingCircle.classList.add('visible');
 			}
-	
+
 			state.htmlElements.uploadMenuFileInputCubeMap.up.disabled = true;
 			state.htmlElements.uploadMenuFileInputCubeMap.down.disabled = true;
 			state.htmlElements.uploadMenuFileInputCubeMap.front.disabled = true;
@@ -198,7 +198,8 @@ export default class UploadMenu {
 			PanoramaEditor.create(
 				state.uploadMenu.images,
 				width,
-				"New CubeMap Panorama"
+				"New CubeMap Panorama",
+				"66265b3916ce5c3e0cd7b63e"
 			);
 
 			state.uploadMenu.finishedWorkers = 0;
@@ -206,11 +207,11 @@ export default class UploadMenu {
 			state.uploadMenu.images = {};
 		}
 
-		let setPreview = (files, index=0) => {
+		let setPreview = (files, index = 0) => {
 			if (files[index].image) {
 				const face = new CubeFace(files[index].side);
 				state.htmlElements.uploadMenuCubeMapFaces.appendChild(face.anchor);
-	
+
 				const img = new Image();
 				img.src = URL.createObjectURL(files[index].image);
 
@@ -223,27 +224,27 @@ export default class UploadMenu {
 					const imageData = state.htmlElements.uploadMenuCanvas.getContext('2d').getImageData(0, 0, width, height);
 					const x = 100 * facePositions[files[index].side].x;
 					const y = 100 * facePositions[files[index].side].y;
-					
+
 					UploadMenu.getDataURL(imageData)
 						.then(url => {
 							face.setPreview(url, x, y);
 							face.onFinishedInterpolation(url);
 						});
-							
+
 					UploadMenu.getBlob(imageData)
 						.then(blob => {
 							state.uploadMenu.images[files[index].side] = blob;
-							
+
 							state.uploadMenu.finishedWorkers++;
 							if (state.uploadMenu.finishedWorkers === 6) {
 								uploadCubeMapFaces(imageData.width);
-							} else if (index+1 < files.length) {
-								setPreview(files, index+1);
+							} else if (index + 1 < files.length) {
+								setPreview(files, index + 1);
 							}
 						});
 				});
-			} else if (index+1 < files.length) {
-				setPreview(files, index+1);
+			} else if (index + 1 < files.length) {
+				setPreview(files, index + 1);
 			}
 		};
 
@@ -275,12 +276,12 @@ export default class UploadMenu {
 		}
 
 		const facePositions = {
-			back: 	{ x: 3, y: 1 },
-			front: 	{ x: 1, y: 1 },
-			left: 	{ x: 0, y: 1 },
-			right: 	{ x: 2, y: 1 },
-			up: 	{ x: 1, y: 0 },
-			down: 	{ x: 1, y: 2 }
+			back: { x: 3, y: 1 },
+			front: { x: 1, y: 1 },
+			left: { x: 0, y: 1 },
+			right: { x: 2, y: 1 },
+			up: { x: 1, y: 0 },
+			down: { x: 1, y: 2 }
 		};
 		for (let [faceName, position] of Object.entries(facePositions)) {
 			UploadMenu.renderFace(data, faceName, position);
@@ -295,7 +296,7 @@ export default class UploadMenu {
 	 * @param {String} faceName The name of the face.
 	 * @param {Object} position The x and y positions within the cubemap.
 	 */
-	static renderFace(data, faceName, position) {
+	static renderFace(data, faceName, position, tourId = "66265b3916ce5c3e0cd7b63e") {
 		const face = new CubeFace(faceName);
 		state.htmlElements.uploadMenuCubeMapFaces.appendChild(face.anchor);
 
@@ -313,7 +314,7 @@ export default class UploadMenu {
 				.then(url => {
 					face.onFinishedInterpolation(url);
 				});
-			
+
 			UploadMenu.getBlob(imageData)
 				.then(blob => {
 					state.uploadMenu.images[faceName] = blob;
@@ -323,7 +324,8 @@ export default class UploadMenu {
 						PanoramaEditor.create(
 							state.uploadMenu.images,
 							imageData.width,
-							state.htmlElements.uploadMenuFileInput.value.replace(/.*[\/\\]/, '')
+							state.htmlElements.uploadMenuFileInput.value.replace(/.*[\/\\]/, ''),
+							tourId
 						);
 
 						state.uploadMenu.finishedWorkers = 0;
@@ -413,14 +415,14 @@ export default class UploadMenu {
 	static openTab(e, tabID) {
 		let tabcontent = document.getElementsByClassName("tabcontent");
 		for (let i = 0; i < tabcontent.length; i++) {
-		  tabcontent[i].style.display = "none";
+			tabcontent[i].style.display = "none";
 		}
-	  
+
 		let tablinks = document.getElementsByClassName("tablinks");
 		for (let i = 0; i < tablinks.length; i++) {
-		  tablinks[i].classList.remove("active");
+			tablinks[i].classList.remove("active");
 		}
-		
+
 		document.getElementById(tabID).style.display = "block";
 		e.currentTarget.classList.add("active");
 	}
@@ -483,7 +485,7 @@ class CubeFace {
 		this.anchor.style.top = `${y}px`;
 	}
 
-	onFinishedInterpolation(url, fileExtension="jpg") {
+	onFinishedInterpolation(url, fileExtension = "jpg") {
 		// this.anchor.href = url;
 		// this.anchor.download = `${this.faceName}.${fileExtension}`;
 		this.img.style.filter = '';

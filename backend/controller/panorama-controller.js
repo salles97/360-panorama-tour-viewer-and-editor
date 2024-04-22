@@ -29,8 +29,9 @@ exports.getAllPanoramas = (req, res) => {
 };
 
 exports.createPanorama = (req, res) => {
+	// const tourId = "66265b3916ce5c3e0cd7b63e";
 	if (!req.files) {
-		res.status(404).json({ error: 'Please provide panorama cubemap image files' });
+		res.status(400).json({ error: 'Please provide panorama cubemap image files' });
 		return;
 	}
 
@@ -43,32 +44,89 @@ exports.createPanorama = (req, res) => {
 		(cubemapLevels) => {
 			panoramaDoc.cubemapLevels = cubemapLevels;
 			panoramaDoc.name = req.body.originalImageFileName || "Unknown name";
-
+			panoramaDoc.tour = req.body.tourId;
 			panoramaDoc.save((err, panorama) => {
 				if (err) {
 					console.error(err);
-					// TODO enviar resposta de erro
+					res.status(500).json({ error: 'Failed to save panorama' });
 					return;
 				}
 				console.log("New panorama added!");
+				console.log(panorama.tour);
 
 				// Se houver um tour associado ao panorama, atualize o tour
 				if (req.body.tourId) {
-					Tour.findByIdAndUpdate(req.body.tourId, { $push: { panoramas: panorama._id } }, (err) => {
+					Tour.findById(req.body.tourId, (err, tour) => {
 						if (err) {
 							console.error(err);
-							// TODO enviar resposta de erro
+							res.status(500).json({ error: 'Failed to find tour' });
 							return;
 						}
-						res.status(200).json({ panorama });
+						if (!tour) {
+							res.status(404).json({ error: 'Tour not found' });
+							return;
+						}
+						tour.panoramas.push(panorama._id);
+						tour.save((err) => {
+							if (err) {
+								console.error(err);
+								res.status(500).json({ error: 'Failed to update tour' });
+								return;
+							}
+							console.log("New panorama added in Tour!");
+							res.status(200).json({ panorama, tour });
+						});
 					});
 				} else {
+					console.log(req.body)
 					res.status(200).json({ panorama });
 				}
 			});
 		}
 	);
 };
+
+// exports.createPanorama = (req, res) => {
+// 	if (!req.files) {
+// 		res.status(404).json({ error: 'Please provide panorama cubemap image files' });
+// 		return;
+// 	}
+
+// 	const panoramaDoc = new Panorama();
+
+// 	generateLevels(
+// 		panoramaDoc._id.toHexString(),
+// 		req.files,
+// 		parseInt(req.body.widthAndHeight),
+// 		(cubemapLevels) => {
+// 			panoramaDoc.cubemapLevels = cubemapLevels;
+// 			panoramaDoc.name = req.body.originalImageFileName || "Unknown name";
+
+// 			panoramaDoc.save((err, panorama) => {
+// 				if (err) {
+// 					console.error(err);
+// 					// TODO enviar resposta de erro
+// 					return;
+// 				}
+// 				console.log("New panorama added!");
+
+// 				// Se houver um tour associado ao panorama, atualize o tour
+// 				if (req.body.tourId) {
+// 					Tour.findByIdAndUpdate(req.body.tourId, { $push: { panoramas: panorama._id } }, (err) => {
+// 						if (err) {
+// 							console.error(err);
+// 							// TODO enviar resposta de erro
+// 							return;
+// 						}
+// 						res.status(200).json({ panorama });
+// 					});
+// 				} else {
+// 					res.status(200).json({ panorama });
+// 				}
+// 			});
+// 		}
+// 	);
+// };
 
 exports.updatePanorama = (req, res) => {
 	const data = req.body.panorama;

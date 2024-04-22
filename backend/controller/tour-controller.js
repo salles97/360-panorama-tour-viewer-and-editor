@@ -15,8 +15,8 @@ exports.getAllTours = (req, res) => {
 exports.createTour = (req, res) => {
   const newTour = new Tour({
     name: req.body.name,
-    user: req.body.userId, // Assumindo que você está enviando o ID do usuário como userId no corpo da solicitação
-    panoramas: req.body.panoramas // Assumindo que você está enviando uma lista de IDs de panoramas como panoramas no corpo da solicitação
+    user: req.body.userId,
+    panoramas: req.body.panoramas
   });
 
   newTour.save((err, tour) => {

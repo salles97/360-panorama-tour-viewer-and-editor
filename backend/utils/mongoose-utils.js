@@ -9,6 +9,7 @@ mongoose.Promise = Promise;
 const models = require('../schemas/models.js');
 const Panorama = mongoose.model('Panorama', models.Panorama);
 const Tour = mongoose.model('Tour', models.Tour); // Importando o modelo Tour
+const User = mongoose.model('User', models.User);
 
 mongoose.set('debug', true);
 fs.mkdirSync(ENV.DB_PATH, { recursive: true });
@@ -79,6 +80,7 @@ const dropDatabase = () => {
 module.exports = {
 	Panorama,
 	Tour, // Adicionando o modelo Tour às exportações
+	User,
 	dropDatabase,
 	populateEmptyDatabase
 }

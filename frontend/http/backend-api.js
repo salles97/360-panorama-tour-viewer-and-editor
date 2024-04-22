@@ -36,7 +36,27 @@ export default class BackendAPI {
 			.catch(error => { reject(error); });
 	}
 
-
+	/**
+	 * Create New Tour
+	 * @method newTour
+	 * @static
+	 * @param {object} user
+	 * @param {Function(Tours)} resolve The callback function to handle the data on successful http request.
+	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
+	 */
+	static newTour(user, req, reject) {
+		body = {
+			"user": user.id,
+			"name": req.body.name,
+			"panoramas": req.body.panoramas
+		};
+		axios.post('/api/tour', body)
+			.then(response => {
+				console.log(response);
+				resolve(response);
+			})
+			.catch(error => { reject(error); });
+	}
 	/**
 		 * Requests backend data about all Tours documents and returns them via callback function.
 		 * @method getAllTours
@@ -109,10 +129,11 @@ export default class BackendAPI {
 	 * @param {Object} images The six panorama cubemap face images to create a new panorama from.
 	 * @param {Number} widthAndHeight The width/height of each cubemap face.
 	 * @param {String} originalImageFileName The name of the panorama image file.
+	 * @param {String} tourId  
 	 * @param {Function(data)} resolve The callback function to handle the data on successful http request.
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
-	static createNewPanorama(images, widthAndHeight, originalImageFileName, resolve, reject) {
+	static createNewPanorama(images, widthAndHeight, originalImageFileName, tourId, resolve, reject) {
 		let formData = new FormData();
 		for (let imageName in images) {
 			let blob = images[imageName];
@@ -120,7 +141,9 @@ export default class BackendAPI {
 		}
 		formData.append('widthAndHeight', widthAndHeight);
 		formData.append('originalImageFileName', originalImageFileName);
+		formData.append('tourId', tourId);
 
+		console.log('O tourId inserido no formData foi', tourId);
 		const config = {
 			headers: { 'content-type': 'multipart/form-data' }
 		}
