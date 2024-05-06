@@ -38,19 +38,53 @@ export default class Main {
 	// }
 	static setup() {
 		// Inicializar a aplicação exibindo a listagem de tours
-		BackendAPI.getAllPanoramaData(
-			Main.startApplication, () => Main.showError);
+		// BackendAPI.getAllPanoramaData(
+		// 	Main.startApplication, () => Main.showError);
+
+
+		//Chamar a lista de panoramas
+		// BackendAPI.getAllToursApi(
+
+		// );
+
+		//a parti dela, chamar o startApplication  passando o id do tour
+
+		// BackendAPI.getPanoramasByTourId(
+		// 	Main.startApplication, () => Main.showError);
+
+		// Criar um novo tour, pegar o id dele, e iniciar as rotas passando ele.
+		const data = {
+			name: "sallesTeste",
+			user: "662654e533d3f012046cca4f"
+		}
+		// BackendAPI.newTour(data,
+		// 	// (tourData) => console.log(tourData))
+		// 	Main.showTourDetails, console.log('aaaa'), () => Main.showError)
+
+		Main.showTourDetails('66265b3916ce5c3e0cd7b63e')
 	}
 
-
+	/**
+		 * Initializes the application with the provided panorama documents.
+		 * This should only be called once on application startup after retrieving the panorama documents.
+		 * @method setup
+		 * @static
+		 * @param {Number} tour_id  
+		 */
 	static showTourDetails(tour_id) {
+		console.log('tour_id', tour_id)
 		// Fazer uma solicitação ao backend para obter os detalhes de um tour específico
-		const tourId = tour_id; // Substitua pelo ID do tour desejado
-		BackendAPI.getTourById(
-			tourId,
+		// Substitua pelo ID do tour desejado
+		BackendAPI.getPanoramasByTourId(
+			tour_id,
 			(tourData) => {
-				// Chamar startApplication() com os detalhes do tour recebidos
-				Main.startApplication(tourData.panoramas);
+				console.log(tourData)
+				if (tourData.length > 0) {
+					// Chamar startApplication() com os detalhes do tour recebidos
+					Main.startApplication(tourData);
+				} else {
+					Main.startApplication();
+				}
 			},
 			(error) => {
 				// Lidar com o erro se não for possível obter os detalhes do tour

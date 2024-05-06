@@ -1,6 +1,9 @@
 import axios from 'node_modules/axios';
 import jwt_decode from 'node_modules/jwt-decode';
 
+// const mongoose = require('mongoose');
+// const models = require('../../backend/schemas/models.js');
+// const Panorama = mongoose.model('Panorama', models.Panorama);
 
 /**
  * This class provides convienient methods to the backend api routes for requesting data.
@@ -31,8 +34,29 @@ export default class BackendAPI {
  * @param {Function(error)} reject The callback function to handle the error message on unsuccessful HTTP request.
  */
 	static getPanoramasByTourId(tourId, resolve, reject) {
-		axios.get(`tours/${tourId}`)
-			.then(response => { resolve(response.data.panoramas); })
+		axios.get(`panorama/id/${tourId}`)
+			.then(response => {
+				console.log(response.data.panoramas.length)
+				if (response.status === 200 && response.data.panoramas.length > 0) {
+					// data.panoramas.forEach((panorama) => {
+					// let panoramaDocument = new Panorama(panorama);
+					// panoramaDocument.save((err, doc) => {
+					// 	if (err) {
+					// 		console.error(e);
+					// 		return;
+					// } else {
+					resolve(response.data.panoramas);
+					// }
+					// })
+					// })
+				}
+				else {
+					let data = JSON.parse(JSON.stringify(require('../../backend/data.json')));
+
+					resolve(data);
+					console.log(response.data.panoramas), resolve(response.data.panoramas);
+				}
+			})
 			.catch(error => { reject(error); });
 	}
 
@@ -40,32 +64,33 @@ export default class BackendAPI {
 	 * Create New Tour
 	 * @method newTour
 	 * @static
-	 * @param {object} user
+	 * @param {object} data
 	 * @param {Function(Tours)} resolve The callback function to handle the data on successful http request.
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
-	static newTour(user, req, reject) {
-		body = {
-			"user": user.id,
-			"name": req.body.name,
-			"panoramas": req.body.panoramas
+	static newTour(data, resolve, reject) {
+		const body = {
+			"user": data.user,
+			"name": data.name
+			// "panoramas": req.panoramas
 		};
-		axios.post('/api/tour', body)
+		axios.post('/api', body)
 			.then(response => {
-				console.log(response);
-				resolve(response);
+				// console.log(response.data.tour._id);
+				resolve(response.data.tour._id);
 			})
 			.catch(error => { reject(error); });
 	}
 	/**
 		 * Requests backend data about all Tours documents and returns them via callback function.
-		 * @method getAllTours
+		 * @method getAllToursApi
 		 * @static
 		 * @param {Function(Tours)} resolve The callback function to handle the data on successful http request.
 		 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 		 */
-	static getAllTours(resolve, reject) {
-		axios.get("/api/tours")
+	static getAllToursApi(resolve, reject) {
+		console.log('getAllToursApi')
+		axios.get("/list-tour")
 			.then(response => {
 				console.log(response);
 				resolve(response.tours);
@@ -82,7 +107,7 @@ export default class BackendAPI {
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
 	static getTourById(id, resolve, reject) {
-		axios.get("/tours" + id)
+		axios.get("/tour" + id)
 			.then(response => { resolve(response.data.views); })
 			.catch(error => { reject(error); });
 	}

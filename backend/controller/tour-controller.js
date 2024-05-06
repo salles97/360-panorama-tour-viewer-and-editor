@@ -8,7 +8,10 @@ exports.getAllTours = (req, res) => {
       // TODO enviar resposta de erro
       return;
     }
-    res.send({ tours: tours });
+    console.log({ tours: tours });
+    // res.json({ tours: tours });
+
+    res.status(200).json({ tours: tours });
   });
 };
 

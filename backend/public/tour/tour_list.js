@@ -1,32 +1,35 @@
 // tour-list.js
+// const TourController = require('../../controller/tour-controller');
+
 // Função para buscar os tours do backend e exibi-los na página
 function fetchTours() {
-  fetch('/api/tours')
+  // TourController.getAllTours
+  fetch('/api')
     .then(response => response.json())
     .then(data => {
-      console.log(data);
+      console.log(data.tours.length);
       const tourListElement = document.getElementById('tourListContainer');
 
       // Limpar o conteúdo anterior, se houver
       tourListElement.innerHTML = '';
 
       // Se não houver tours, exibir o botão "Criar Tour"
-      if (data.tours.length === 0) {
-        const createTourButton = document.createElement('button');
-        createTourButton.textContent = 'Criar Tour';
-        createTourButton.addEventListener('click', () => {
-          // Redirecionar para a página de criação de tour ou executar a lógica necessária para criar um novo tour
-          window.location.href = '/';
+      const createTourButton = document.createElement('button');
+      createTourButton.textContent = 'Criar Tour';
+      createTourButton.addEventListener('click', () => {
+        // Redirecionar para a página de criação de tour ou executar a lógica necessária para criar um novo tour
+        window.location.href = '/';
 
-        });
-        tourListElement.appendChild(createTourButton);
+      });
+      tourListElement.appendChild(createTourButton);
+      if (data.tours.length === 0) {
       } else {
         // Criar uma lista não ordenada para os tours
         const ulElement = document.createElement('ul');
         ulElement.id = 'tourList';
 
         // Iterar sobre os dados dos tours e adicionar cada um como um item de lista
-        data.forEach(tour => {
+        data.tours.forEach(tour => {
           const listItem = document.createElement('li');
           listItem.textContent = tour.name;
           ulElement.appendChild(listItem);

@@ -7,10 +7,11 @@ const { Panorama, Tour } = require('../utils/mongoose-utils'); // Importe o mode
 const { generateLevels } = require('../utils/cubemap-generator-utils');
 
 exports.getPanoramasForTour = async (req, res) => {
+	console.log('Entrou');
 	try {
 		const tourId = req.params.tourId;
 		const panoramas = await Panorama.find({ tour: tourId }).populate('hotspots');
-		res.json({ panoramas });
+		res.send({ panoramas: panoramas });
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ error: 'Internal Server Error' });
