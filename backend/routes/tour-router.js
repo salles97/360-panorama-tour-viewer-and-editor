@@ -11,7 +11,7 @@ const router = express.Router();
 router.get('/', TourController.getAllTours)
 router.post('/', TourController.createTour); // adds new panorama image
 // router.put('/', (req, res, next) => checkAuth(req, res, next, ["admin"]), TourController.updateTour); // update an existing panorama image
-// router.delete('/', (req, res, next) => checkAuth(req, res, next, ["admin"]), TourController.deleteTour); // delete a panorama image
-
+router.delete('/:tourId', TourController.deleteTour); // delete a panorama image
+router.get('/:tourId', TourController.getTourById)
 
 module.exports = router;

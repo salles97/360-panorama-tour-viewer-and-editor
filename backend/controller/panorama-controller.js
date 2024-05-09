@@ -30,7 +30,7 @@ exports.getAllPanoramas = (req, res) => {
 };
 
 exports.createPanorama = (req, res) => {
-	// const tourId = "66265b3916ce5c3e0cd7b63e";
+	const tourId = "66265b3916ce5c3e0cd7b63e";
 	if (!req.files) {
 		res.status(400).json({ error: 'Please provide panorama cubemap image files' });
 		return;
@@ -173,4 +173,25 @@ exports.deletePanorama = (req, res) => {
 			res.send({ deleted: true });
 		});
 	});
+};
+
+
+exports.getPanoramaById = (req, res) => {
+	const panoramaId = req.params.panoramaId;
+
+	Panorama.findById(panoramaId)
+		.populate('hotspots') // Opcional: popula os hotspots relacionados ao panorama
+		.exec((err, panorama) => {
+			if (err) {
+				console.error(err);
+				// TODO: enviar resposta de erro
+				return res.status(500).json({ error: 'Erro interno do servidor' });
+			}
+			if (!panorama) {
+				// Panorama não encontrado
+				return res.status(404).json({ error: 'Panorama não encontrado' });
+			}
+			// Panorama encontrado, envie como resposta
+			return res.status(200).json({ panorama: panorama });
+		});
 };

@@ -13,6 +13,6 @@ router.post('/', (req, res, next) => checkAuth(req, res, next, ["admin"]), uploa
 router.put('/', (req, res, next) => checkAuth(req, res, next, ["admin"]), PanoramaController.updatePanorama); // update an existing panorama image
 router.delete('/', (req, res, next) => checkAuth(req, res, next, ["admin"]), PanoramaController.deletePanorama); // delete a panorama image
 router.get('/id/:tourId', PanoramaController.getPanoramasForTour);
-
+router.get('/:panoramaId', PanoramaController.getPanoramaById);
 
 module.exports = router;

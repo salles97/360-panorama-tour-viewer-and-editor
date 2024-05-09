@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+// const index = require('../frontend/index')
+// import index from '../frontend/index';
 
 const ENV = require('./constants');
 
@@ -36,36 +38,28 @@ app.use('/panorama', PanoramaRouter);
 app.use('/hotspot', HotspotRouter);
 app.use('/user', UserRouter);
 app.use('/api', TourRouter); // Use as rotas do Tour
-// app.get('/tour', TourController.getAllTours); // adds new panorama image
 
-// app.get('/tour', (req, res) => {
-//   // Lógica para buscar os dados dos tours no banco de dados ou em outro local
-//   const tours = TourController.getAllTours // Obtenha os dados dos tours
-//   console.log(tours)
-//   // Envie os dados como JSON
-//   res.status(200).send(tours);
-// });
-
-// app.post('/tour', TourController.createTour);
 // /data is deprecated: use /panoramas/ instead
 app.get('/data', PanoramaController.getAllPanoramas);
 app.get('/panoramas', PanoramaController.getAllPanoramas);
-// app.get('/api/tours',
-//   TourController.getAllTours
-// );
 
-// // Middleware condicional para decidir como lidar com a solicitação com base no parâmetro de consulta "id"
-// app.use('/panorama', (req, res, next) => {
-//   // Verifique se o parâmetro de consulta "id" está presente na URL
-//   if (req.query.id) {
-//     // Se "id" estiver presente, encaminhe a solicitação para a lógica que lida com dados filtrados
-//     next(); // Encaminhar para a próxima rota
-//   } else {
-//     // Se "id" não estiver presente, continue servindo os arquivos estáticos
-//     express.static(ENV.STATIC_FILES)(req, res, next);
-//   }
+
+// app.get('/:id', (req, res) => {
+//   // Como os arquivos HTML já estão sendo servidos pelo express.static,
+//   // não é necessário especificar o caminho do arquivo novamente.
+//   // O Express irá automaticamente procurar o arquivo HTML correspondente no diretório STATIC_FILES
+//   // com base no ID fornecido na rota.
+
+//   // O ID do tour está disponível em req.params.id
+//   const tourId = req.params.id;
+
+//   // Aqui você pode manipular o tourId conforme necessário
+//   // ou passá-lo para a função que precisar.
+
+//   // Por exemplo, você pode chamar a função setup da sua aplicação frontend
+//   // e passar o tourId como um parâmetro, se necessário.
+//   index.initializeApp(tourId)
 // });
-
 
 // SWAGGER API
 
