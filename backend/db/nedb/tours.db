@@ -10,4 +10,7 @@
 {"_id":"663517f76eeaa129cc4fad14","panoramas":[],"name":"Teste2","__v":0}
 {"_id":"663518071c267e2554da71ff","panoramas":[],"name":"Teste2","__v":0}
 {"_id":"663cd7c26990b30cc4509d1b","panoramas":[],"name":"sallesTeste","__v":0}
-{"user":"663cd6064496411e28acab5b","_id":"663cd8386990b30cc4509d1c","panoramas":[],"name":"sallesTeste","__v":0}
+{"user":"663cd6064496411e28acab5b","_id":"663cd8386990b30cc4509d1c","panoramas":["663ce31a6ef36231e062ac3c"],"name":"sallesTeste","__v":1}
+{"_id":"663d1ce0cb816b37acf59287","panoramas":[],"name":"AtulizadoTour","__v":0}
+{"_id":"663d1ce6cb816b37acf59288","panoramas":[],"name":"AtualizadoTour","__v":0}
+{"user":"663cd6064496411e28acab5b","_id":"663cd8386990b30cc4509d1c","panoramas":["663ce31a6ef36231e062ac3c"],"name":"AtualizadoTour","__v":1}

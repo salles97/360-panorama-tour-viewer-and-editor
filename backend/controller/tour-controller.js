@@ -60,6 +60,38 @@ exports.getTourById = (req, res) => {
 //   });
 // };
 
+exports.updateTour = (req, res) => {
+  const data = req.body;
+  console.log(req.body)
+  Tour.findById({ _id: data._id }, (err, tour) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ err });
+      // TODO enviar resposta de erro
+      return;
+    }
+    console.log(data);
+
+    // Remova dados que não podem ser alterados via esta solicitação
+    delete data._id;
+    delete data._user;
+    delete data.hotspots;
+
+    for (const key in data) {
+      tour[key] = data[key];
+    }
+
+    tour.save((err, updatedTour) => {
+      if (err) {
+        console.error(err);
+        // TODO enviar resposta de erro
+        return;
+      }
+      res.send({ tour: updatedTour });
+    });
+  });
+};
+
 exports.deleteTour = (req, res) => {
   Tour.deleteOne({ _id: req.params.tourId }, (err) => {
     if (err) {

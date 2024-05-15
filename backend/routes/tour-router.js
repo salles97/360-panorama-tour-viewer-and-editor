@@ -13,5 +13,6 @@ router.post('/', TourController.createTour); // adds new panorama image
 // router.put('/', (req, res, next) => checkAuth(req, res, next, ["admin"]), TourController.updateTour); // update an existing panorama image
 router.delete('/:tourId', TourController.deleteTour); // delete a panorama image
 router.get('/:tourId', TourController.getTourById)
+router.put('/', TourController.updateTour)
 
 module.exports = router;

@@ -30,7 +30,8 @@ exports.getAllPanoramas = (req, res) => {
 };
 
 exports.createPanorama = (req, res) => {
-	const tourId = "66265b3916ce5c3e0cd7b63e";
+	// const tourId = "66265b3916ce5c3e0cd7b63e";
+	console.log('Criar Panorama')
 	if (!req.files) {
 		res.status(400).json({ error: 'Please provide panorama cubemap image files' });
 		return;
