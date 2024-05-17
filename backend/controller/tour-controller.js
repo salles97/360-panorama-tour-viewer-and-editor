@@ -2,6 +2,7 @@ const { Tour } = require('../utils/mongoose-utils');
 
 
 exports.getAllTours = (req, res) => {
+  console.log('aaaa')
   Tour.find({})
     // .populate('user') // Popula o campo de usuário
     .populate('panoramas') // Popula o campo de panoramas

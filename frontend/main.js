@@ -61,8 +61,13 @@ export default class Main {
 		// 	// (tourData) => console.log(tourData))
 		// 	Main.showTourDetails, console.log('aaaa'), () => Main.showError)
 
-		Main.showTourDetails('66265b3916ce5c3e0cd7b63e')
+		const currentUrl = window.location.href;
+		const id = currentUrl.split('/')[3];
+		Main.showTourDetails(id)
+		console.log("id")
+		console.log(id)
 	}
+
 
 	/**
 		 * Initializes the application with the provided panorama documents.
@@ -78,6 +83,7 @@ export default class Main {
 		BackendAPI.getPanoramasByTourId(
 			tour_id,
 			(tourData) => {
+				console.log('tourData')
 				console.log(tourData)
 				if (tourData.length > 0) {
 					// Chamar startApplication() com os detalhes do tour recebidos

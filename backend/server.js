@@ -29,7 +29,7 @@ app.use(cors()); // enables cors for all routes
 
 // ROUTES
 
-app.use('/', express.static(ENV.STATIC_FILES)); // serve frontend files statically
+app.use('/:id', express.static(ENV.STATIC_FILES)); // serve frontend files statically
 app.use('/list-tour', express.static(ENV.TOUR_DIRECTORY)); // serve frontend files statically
 app.use('/cubemaps/', express.static(ENV.PANORAMA_DIRECTORY)); // serve panorama pictures
 app.use('/cmd/', express.static(ENV.CMD_BUILDING_OUTLINES_DIRECTORY)); // serve building outlines

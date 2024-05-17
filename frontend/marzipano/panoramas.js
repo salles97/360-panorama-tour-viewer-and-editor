@@ -1,11 +1,11 @@
-import Main		 		from 'frontend/main';
-import Hotspots			from 'frontend/marzipano/hotspots';
-import PanoramaList		from 'frontend/menus/panorama-list';
-import DetailSidebar	from 'frontend/menus/detail-sidebar';
-import Minimap 			from 'frontend/map/minimap';
-import Autorotation		from 'frontend/others/autorotate';
+import Main from 'frontend/main';
+import Hotspots from 'frontend/marzipano/hotspots';
+import PanoramaList from 'frontend/menus/panorama-list';
+import DetailSidebar from 'frontend/menus/detail-sidebar';
+import Minimap from 'frontend/map/minimap';
+import Autorotation from 'frontend/others/autorotate';
 
-import Marzipano		from 'marzipano';
+import Marzipano from 'marzipano';
 
 /**
  * This static class allows the creation of Marzipano panorama scenes.
@@ -15,7 +15,7 @@ import Marzipano		from 'marzipano';
  * @static
  */
 export default class Panoramas {
-	
+
 	/**
 	 * Initializes all panoramas by creating the Marzipano viewer and adding Marzipano panorama scenes to it based on the provided panorama documents.
 	 * @method setup
@@ -37,45 +37,47 @@ export default class Panoramas {
 		state.viewer = new Marzipano.Viewer(state.htmlElements.pano, viewerOptions)
 
 		// create Marzipano panorama scenes
-		panoramaDocuments = panoramaDocuments.sort((a,b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+		panoramaDocuments = panoramaDocuments.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 		let panoramas = panoramaDocuments.map(Panoramas.createPanorama);
-		
+
 		state.panoramasByID = {};
 		for (let panorama of panoramas) {
 			state.panoramasByID[panorama.data._id] = panorama;
 		}
 	}
 
+
 	/**
-	 * Creates a new marzipano scene based on the provided panorama document data.
-	 * @method createPanorama
-	 * @static
-	 * @param {Object} panoramaData The panorama document to create a new marzipano scene from.
-	 * @return {Object} The new panorama object containing the marzipano scene and the panorama document data the scene was created from (plus an empty array for holding points-of-interests).
-	 */
+ * Creates a new marzipano scene based on the provided panorama document data.
+ * @method createPanorama
+ * @static
+ * @param {Object} panoramaData The panorama document to create a new marzipano scene from.
+ * @return {Object} The new panorama object containing the marzipano scene and the panorama document data the scene was created from (plus an empty array for holding points-of-interests).
+ */
 	static createPanorama(panoramaData) {
+		const baseUrl = "http://localhost:3000"; // Modify this to your new base URL
 		const getFaceName = (z) => { return { l: "left", f: "front", r: "right", b: "back", u: "up", d: "down" }[z]; };
-		const getTileUrl = (panoramaImageId, f, level, x, y) => "cubemaps/" + panoramaImageId + "/" + level + "/" + getFaceName(f) + "/tile-" + x + "-" + y + ".jpg";
-		
+		const getTileUrl = (panoramaImageId, f, level, x, y) => baseUrl + "/cubemaps/" + panoramaImageId + "/" + level + "/" + getFaceName(f) + "/tile-" + x + "-" + y + ".jpg";
+
 		let source = new Marzipano.ImageUrlSource((tile) => {
 			return { url: getTileUrl(panoramaData._id, tile.face, tile.z, tile.x, tile.y) };
 		});
-		
+
 		const levels = panoramaData.cubemapLevels;
-		const maxResolution = levels[levels.length-1].size;
+		const maxResolution = levels[levels.length - 1].size;
 		const fov = Main.degToRad(110);
 
 		let geometry = new Marzipano.CubeGeometry(levels);
 		let limiter = Marzipano.RectilinearView.limit.traditional(maxResolution, fov);
 		let view = new Marzipano.RectilinearView({ fov: fov }, limiter);
-		
+
 		let scene = state.viewer.createScene({
 			source: source,
 			geometry: geometry,
 			view: view,
 			pinFirstLevel: true // state.settings.preloadAllPanoramaImages // if true preloads all panorama images on startup (slower startup, but no transition animation because of long load time)
 		});
-		
+
 		let panorama = {
 			data: panoramaData,
 			scene: scene
@@ -83,7 +85,6 @@ export default class Panoramas {
 
 		return panorama;
 	}
-
 
 	/**
 	 * Searches for a panorama by its unique id.
@@ -96,7 +97,7 @@ export default class Panoramas {
 		return state.panoramasByID[panoramaID];
 	}
 
-	
+
 	/**
 	 * Switches from the current panorama to the provided panorama. Also updates related UI elements like the panorama list and panorama name.
 	 * @method switchToPanorama
@@ -104,7 +105,7 @@ export default class Panoramas {
 	 * @param {Object} panorama The panorama object containing the marzipano scene to switch to.
 	 * @param {Object} [viewParameters={}] Optional view parameters that are provided to the viewer on scene switch (yaw, pitch, fov and transition duration).
 	 */
-	static switchToPanorama(panorama, viewParameters={}) {
+	static switchToPanorama(panorama, viewParameters = {}) {
 		if (state.tempData.disableInteraction) {
 			return;
 		}
@@ -132,25 +133,25 @@ export default class Panoramas {
 		if (panorama.data.fov) {
 			sceneInitialViewParameters.fov = panorama.data.fov;
 		}
-		initialViewParameters = {...initialViewParameters, ...sceneInitialViewParameters, ...viewParameters};
-		
+		initialViewParameters = { ...initialViewParameters, ...sceneInitialViewParameters, ...viewParameters };
+
 		// preserve orientations from previous panorama (factor in offset from compass orientation relative to north)
 		if (previousPanorama && viewParameters.preserveOrientationBetweenPanoramas) {
 			let previousViewParameters = previousPanorama.scene.view().parameters();
 			initialViewParameters.yaw = Main.radToDeg(previousViewParameters.yaw) - previousPanorama.data.orientation;
 			initialViewParameters.pitch = Main.radToDeg(previousViewParameters.pitch);
 		}
-		
+
 		// convert view parameters to rad
 		initialViewParameters = {
-			yaw:	Main.degToRad(initialViewParameters.yaw + panorama.data.orientation),
-			pitch:	Main.degToRad(initialViewParameters.pitch),
-			fov:	Main.degToRad(initialViewParameters.fov),
+			yaw: Main.degToRad(initialViewParameters.yaw + panorama.data.orientation),
+			pitch: Main.degToRad(initialViewParameters.pitch),
+			fov: Main.degToRad(initialViewParameters.fov),
 		}
 
 		panorama.scene.view().setParameters(initialViewParameters);
 		panorama.scene.switchTo({ transitionDuration: viewParameters.transitionDuration !== undefined ? viewParameters.transitionDuration : state.settings.panoramaTransitionDuration });
-		
+
 		DetailSidebar.close();
 		Autorotation.start();
 		Panoramas.updatePanoramaName(panorama);
@@ -158,7 +159,7 @@ export default class Panoramas {
 		Hotspots.loadPOIsForPanorama(panorama);
 		Minimap.update(panorama);
 	}
-	
+
 
 	/**
 	 * Determines the panorama that the application is supposed to be showing on first startup.
@@ -175,14 +176,14 @@ export default class Panoramas {
 		window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, (m, key, value) => {
 			urlParams[key] = value;
 		});
-	
+
 		// determine starting panorama based on panorama data 'isStart' entry (overwrites previous)
 		for (let panorama of panoramas) {
 			if (panorama.data.isStart) {
 				startPanorama = panorama;
 			}
 		}
-	
+
 		// determine starting panorama based on 'startPanorama' url parameter (overwrites previous)
 		if (urlParams['startPanorama']) {
 			let panorama = Panoramas.findPanoramaByID(urlParams['startPanorama'])
@@ -190,7 +191,7 @@ export default class Panoramas {
 				startPanorama = panorama;
 			}
 		}
-	
+
 		// determine starting panorama based on 'latitude' and 'longitude' and 'floor' url parameters and the closest panorama to that coord (overwrites previous)
 		if (urlParams['latitude'] && urlParams['longitude']) {
 			const latitude = Main.degToRad(parseFloat(urlParams['latitude']));
@@ -208,15 +209,15 @@ export default class Panoramas {
 				}
 				const panoramaLatitude = Main.degToRad(panorama.data.lat);
 				const panoramaLongitude = Main.degToRad(panorama.data.lng);
-				
+
 				const dlat = panoramaLatitude - latitude;
 				const dlng = panoramaLongitude - longitude;
-				
+
 				const a = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(panoramaLongitude) * Math.cos(latitude) * Math.pow(Math.sin(dlng / 2), 2);
 				const c = 2 * Math.asin(Math.sqrt(a));
 
 				const distance = c * earthRadius;
-				
+
 				if (distance < closestPanorama.distance) {
 					closestPanorama = {
 						panorama: panorama,

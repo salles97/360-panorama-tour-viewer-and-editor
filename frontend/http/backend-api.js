@@ -1,4 +1,5 @@
-import axios from 'node_modules/axios';
+// import axiosInstance from 'node_modules/axiosInstance';
+import axiosInstance from './axiosConfig';
 import jwt_decode from 'node_modules/jwt-decode';
 
 // const mongoose = require('mongoose');
@@ -20,7 +21,7 @@ export default class BackendAPI {
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
 	static getAllPanoramaData(resolve, reject) {
-		axios.get("panoramas/")
+		axiosInstance.get("panoramas/")
 			.then(response => { resolve(response.data.panoramas); })
 			.catch(error => { reject(error); });
 	}
@@ -34,7 +35,7 @@ export default class BackendAPI {
  * @param {Function(error)} reject The callback function to handle the error message on unsuccessful HTTP request.
  */
 	static getPanoramasByTourId(tourId, resolve, reject) {
-		axios.get(`panorama/id/${tourId}`)
+		axiosInstance.get(`panorama/id/${tourId}`)
 			.then(response => {
 				console.log(response.data.panoramas.length)
 				if (response.status === 200 && response.data.panoramas.length > 0) {
@@ -74,7 +75,7 @@ export default class BackendAPI {
 			"name": data.name
 			// "panoramas": req.panoramas
 		};
-		axios.post('/api', body)
+		axiosInstance.post('/api', body)
 			.then(response => {
 				// console.log(response.data.tour._id);
 				resolve(response.data.tour._id);
@@ -90,7 +91,7 @@ export default class BackendAPI {
 		 */
 	static getAllToursApi(resolve, reject) {
 		console.log('getAllToursApi')
-		axios.get("/list-tour")
+		axiosInstance.get("/list-tour")
 			.then(response => {
 				console.log(response);
 				resolve(response.tours);
@@ -107,7 +108,7 @@ export default class BackendAPI {
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
 	static getTourById(id, resolve, reject) {
-		axios.get("/tour" + id)
+		axiosInstance.get("/tour" + id)
 			.then(response => { resolve(response.data.views); })
 			.catch(error => { reject(error); });
 	}
@@ -125,7 +126,7 @@ export default class BackendAPI {
 	//  * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	//  */
 	// static getPOIData(latitude, longitude, radius, floor, resolve, reject) {
-	// 	axios.get("pois?lat=" + latitude + "&lon=" + longitude + "&radius=" + radius + "&floor=" + floor)
+	// 	axiosInstance.get("pois?lat=" + latitude + "&lon=" + longitude + "&radius=" + radius + "&floor=" + floor)
 	// 		.then(response => { resolve(response.data); })
 	// 		.catch(error => { reject(error); });
 	// }
@@ -139,7 +140,7 @@ export default class BackendAPI {
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
 	static getCMDBuildingInfo(buildingName, resolve, reject) {
-		axios.get("/cmd/" + buildingName + ".json")
+		axiosInstance.get("/cmd/" + buildingName + ".json")
 			.then(response => { resolve(response.data.building); })
 			.catch(error => { reject(error); });
 	}
@@ -172,7 +173,7 @@ export default class BackendAPI {
 		const config = {
 			headers: { 'content-type': 'multipart/form-data' }
 		}
-		axios
+		axiosInstance
 			.post('panorama', formData, config).then(response => {
 				resolve(response.data);
 			}).catch(error => {
@@ -189,7 +190,7 @@ export default class BackendAPI {
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
 	static updatePanorama(panorama, resolve, reject) {
-		axios.put("panorama", { panorama: panorama })
+		axiosInstance.put("panorama", { panorama: panorama })
 			.then(response => { resolve(response.data); })
 			.catch(error => { reject(error); });
 	}
@@ -203,7 +204,7 @@ export default class BackendAPI {
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
 	static deletePanorama(_id, resolve, reject) {
-		axios({
+		axiosInstance({
 			method: 'delete',
 			url: 'panorama',
 			data: { _id: _id }
@@ -223,7 +224,7 @@ export default class BackendAPI {
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
 	static createNewHotspot(panoramaId, hotspot, resolve, reject) {
-		axios({
+		axiosInstance({
 			method: 'post',
 			url: 'hotspot',
 			data: {
@@ -244,7 +245,7 @@ export default class BackendAPI {
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
 	static updateHotspot(hotspot, resolve, reject) {
-		axios.put("hotspot", { hotspot: hotspot })
+		axiosInstance.put("hotspot", { hotspot: hotspot })
 			.then(response => { resolve(response.data); })
 			.catch(error => { reject(error); });
 	}
@@ -258,7 +259,7 @@ export default class BackendAPI {
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
 	static deleteHotspot(_id, resolve, reject) {
-		axios({
+		axiosInstance({
 			method: 'delete',
 			url: 'hotspot',
 			data: { _id: _id }
@@ -278,7 +279,7 @@ export default class BackendAPI {
 	 * @param {Function(error)} reject The callback function to handle the error message on unsuccessful http request.
 	 */
 	static login(username, password, resolve, reject) {
-		axios({
+		axiosInstance({
 			method: 'post',
 			url: 'user/login',
 			data: {
@@ -289,14 +290,14 @@ export default class BackendAPI {
 			.then(response => {
 				const { token } = response.data;
 				if (token) {
-					axios.defaults.headers.common['Authorization'] = token;
+					axiosInstance.defaults.headers.common['Authorization'] = token;
 					localStorage.setItem('jwt_token', token);
 					const decodedToken = jwt_decode(token);
 					resolve(decodedToken);
 				} else {
 					// causes Webpack 5 ModuleConcatenationPlugin error
-					// delete axios.defaults.headers.common['Authorization'];
-					axios.defaults.headers.common['Authorization'] = undefined;
+					// delete axiosInstance.defaults.headers.common['Authorization'];
+					axiosInstance.defaults.headers.common['Authorization'] = undefined;
 					localStorage.removeItem('jwt_token');
 					resolve(undefined);
 				}
@@ -320,7 +321,7 @@ export default class BackendAPI {
 			return;
 		}
 
-		axios.defaults.headers.common['Authorization'] = token;
+		axiosInstance.defaults.headers.common['Authorization'] = token;
 		axios({
 			method: 'get',
 			url: 'user/isAdmin'
@@ -329,15 +330,15 @@ export default class BackendAPI {
 				if (response.status === 200) {
 					resolve();
 				} else {
-					axios.defaults.headers.common['Authorization'] = undefined;
+					axiosInstance.defaults.headers.common['Authorization'] = undefined;
 					localStorage.removeItem('jwt_token');
 					reject(true);
 				}
 			})
 			.catch(error => {
 				// causes Webpack 5 ModuleConcatenationPlugin error
-				// delete axios.defaults.headers.common['Authorization'];
-				axios.defaults.headers.common['Authorization'] = undefined;
+				// delete axiosInstance.defaults.headers.common['Authorization'];
+				axiosInstance.defaults.headers.common['Authorization'] = undefined;
 				localStorage.removeItem('jwt_token');
 				reject(true);
 			});
